@@ -77,13 +77,13 @@ class _NoiseMeterAppState extends State<NoiseMeterApp> {
                       ),
                       Container(
                         child: Text(
-                          'Noise: ${_latestReading?.meanDecibel.toStringAsFixed(2)} dB',
+                          'Noise: ${_latestReading?.rmsDecibel.toStringAsFixed(2)} dB',
                         ),
                         margin: EdgeInsets.only(top: 20),
                       ),
                       Container(
                         child: Text(
-                          'Max: ${_latestReading?.maxDecibel.toStringAsFixed(2)} dB',
+                          'Max: ${_latestReading?.normalizedRmsDecibel.toStringAsFixed(2)} dB',
                         ),
                       )
                     ])),
