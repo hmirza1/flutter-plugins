@@ -74,15 +74,17 @@ public class SwiftAudioStreamerPlugin: NSObject, FlutterPlugin, FlutterStreamHan
   }
 
   // Handle stream emitting (Swift => Flutter)
-  private func emitValues(values: [Float]) {
-
+ private func emitValues(values: [Float]) {
     // If no eventSink to emit events to, do nothing (wait)
-    if eventSink == nil {
-      return
+    guard let eventSink = self.eventSink else {
+        return
     }
-    // Emit values count event to Flutter
-    eventSink!(values)
-  }
+    
+    // Ensure we're on the main thread when sending events to Flutter
+    DispatchQueue.main.async {
+        eventSink(values)
+    }
+}
 
   // Event Channel: On Stream Listen
   public func onListen(
@@ -124,7 +126,9 @@ public class SwiftAudioStreamerPlugin: NSObject, FlutterPlugin, FlutterStreamHan
       let bus = 0
 
       input.installTap(onBus: bus, bufferSize: 22050, format: input.inputFormat(forBus: bus)) {
-        buffer, _ -> Void in
+        [weak self] buffer, _ -> Void in
+        guard let self = self else { return }
+        
         let samples = buffer.floatChannelData?[0]
         // audio callback, samples in samples[0]...samples[buffer.frameLength-1]
         let arr = Array(UnsafeBufferPointer(start: samples, count: Int(buffer.frameLength)))
